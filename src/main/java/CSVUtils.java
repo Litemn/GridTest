@@ -55,4 +55,48 @@ public class CSVUtils {
         }
 
     }
+
+
+
+
+
+    public static void largerFileJoid(File file1, File file2, String resultName) throws IOException, FileNotFoundException {
+        File tempFile = new File(resultName);
+
+
+        tempFile.createNewFile();
+
+
+        Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(tempFile), "utf-8"));
+        BufferedReader br = new BufferedReader(new FileReader(file1));
+
+
+
+        String line;
+        while((line = br.readLine()) != null) {
+            String[] text = line.split(",");
+            int id = Integer.valueOf(text[0]);
+            String line2;
+            BufferedReader br2 = new BufferedReader(new FileReader(file2));
+
+            while (((line2=br2.readLine())!=null)){
+                String[] text2 = line2.split(",");
+                int id2 = Integer.valueOf(text2[0]);
+                if(id == id2){
+                    writer.write(line + "," + text2[1] + "\n");
+                }
+
+            }
+            br2.close();
+        }
+        br.close();
+
+  writer.close();
+
+
+
+
+    }
+
 }

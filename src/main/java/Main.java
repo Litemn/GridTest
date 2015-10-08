@@ -6,7 +6,7 @@ import java.io.File;
 public class Main {
     public static void main(String[] args) {
         try{
-            CSVUtils.join(new File("A.csv"),new File("B.csv"),"Result.csv");
+            CSVUtils.largerFileJoid(new File("input_A.csv"),new File("input_B.csv"),"result.csv");
         } catch (Exception e ){
             e.printStackTrace();
         }
