@@ -56,47 +56,90 @@ public class CSVUtils {
 
     }
 
-
-
-
-
-    public static void largerFileJoid(File file1, File file2, String resultName) throws IOException, FileNotFoundException {
-        File tempFile = new File(resultName);
-
-
-        tempFile.createNewFile();
-
-
-        Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(tempFile), "utf-8"));
-        BufferedReader br = new BufferedReader(new FileReader(file1));
-
-
-
-        String line;
-        while((line = br.readLine()) != null) {
-            String[] text = line.split(",");
-            int id = Integer.valueOf(text[0]);
-            String line2;
-            BufferedReader br2 = new BufferedReader(new FileReader(file2));
-
-            while (((line2=br2.readLine())!=null)){
-                String[] text2 = line2.split(",");
-                int id2 = Integer.valueOf(text2[0]);
-                if(id == id2){
-                    writer.write(line + "," + text2[1] + "\n");
-                }
-
-            }
-            br2.close();
-        }
-        br.close();
-
-  writer.close();
-
-
-
+    //set position id in index file
+    private static void position(RandomAccessFile raf, int i, long pos) throws IOException {
+        raf.seek((i) * 10); // 10 byte in index line
+        raf.write((String.format("%09d\n", pos).getBytes()));
 
     }
+    // get position by id from index file
+    private static int position(RandomAccessFile raf, int i) throws IOException {
+        raf.seek((i) * 10);
+        int id = Integer.valueOf(raf.readLine());
+        return id;
+    }
+
+    public static void joinBigTable(File A, File B, String Name) throws IOException {
+        final long MAX = 999999999; //bigger than max range
+        final int LINES_N = 1000000;
+        final int CONSOLE = 200000; // magic int for showing that app not dead
+        final int BYTE_IN_LINE = 25; // byte in one line
+        File temp = new File(Name);
+        temp.createNewFile();
+
+        File index = new File("index"); // index file for 'A' file
+        index.createNewFile();
+        RandomAccessFile raf = new RandomAccessFile(index, "rw");
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(index), "utf-8"))) {
+            for (int i = 0; i <= LINES_N; i++) {
+                writer.write(String.format("%d\n", MAX)); // create 'empty' index file
+            }
+        }
+
+        System.out.println("Created index");
+
+
+        RandomAccessFile raf1 = new RandomAccessFile(A, "r");
+        String line;
+        int repeat = 0;
+        long pos = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(A))) {
+            while ((line = br.readLine()) != null) {
+                int id = Integer.valueOf(line.substring(0, 9));
+                position(raf, id, pos); // set index value to index file
+                pos += BYTE_IN_LINE; // inc position of id
+                repeat++;
+                if (repeat / CONSOLE == 1) {
+                    System.out.println("...");
+                    repeat = 0;
+                }
+            }
+        }
+        System.out.println("indexing complete");
+        repeat = 0;
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(Name), "utf-8"));
+             BufferedReader br = new BufferedReader(new FileReader(B))) {
+
+            while (((line = br.readLine()) != null)) {
+
+                int id = Integer.valueOf(line.substring(0, 9));
+                if (position(raf, id) != MAX) { // if index file have link to id
+                    raf1.seek(position(raf, id));
+                    String res = raf1.readLine();
+                    writer.write(String.format("%s,%s\n",res,line.substring(10)));
+                    repeat++;
+                    if (repeat / CONSOLE == 1) {
+                        System.out.println("...");
+                        repeat = 0;
+                    }
+                }
+
+
+            }
+        }
+        System.out.println("Join done");
+        index.delete();
+        raf.close();
+        raf1.close();
+    }
+
+
+
 
 }
+
+
+
