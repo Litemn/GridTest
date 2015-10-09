@@ -22,15 +22,9 @@ public class Generator {
         }
         return new String(string);
     }
-    public static void main(String[] args) {
-        if(args.length != 4){
-            System.out.print("Enter 4 arguments(range and file names)");
-            return;
-        }
-        int range = Integer.valueOf(args[0]);
-        int lines = Integer.valueOf(args[1]);
-        String name1 = args[2];
-        String name2 = args[3];
+
+    public static void generate(int range, int lines, String name1, String name2){
+
         Random rand = new Random();
 
 
@@ -42,7 +36,7 @@ public class Generator {
                 writer.write(String.format("%09d,%s\n",randomInt(0,range,rand),randomString(14,rand)));
             }
 
-    } catch (Exception e){
+        } catch (Exception e){
 
         }
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
@@ -53,7 +47,20 @@ public class Generator {
             }
 
         } catch (Exception e){
-    e.printStackTrace();
+            e.printStackTrace();
         }
+    }
+    public static void main(String[] args) {
+        if(args.length != 4){
+            System.out.print("Enter 4 arguments(range and file names)");
+            return;
+        }
+        int range = Integer.valueOf(args[0]);
+        int lines = Integer.valueOf(args[1]);
+        String name1 = args[2];
+        String name2 = args[3];
 
+
+
+        generate(range,lines,name1,name2);
 }}
