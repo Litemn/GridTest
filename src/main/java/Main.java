@@ -6,7 +6,12 @@ import java.io.File;
 public class Main {
     public static void main(String[] args) {
         try{
-            CSVUtils.largerFileJoid(new File("input_A.csv"),new File("input_B.csv"),"result.csv");
+            CSVUtils.join(new File("A.csv"),new File("B.csv"),"Result.csv");
+            System.out.println("Complete join small tables");
+            System.out.println("Starting join big tables...It's take a while");
+            CSVUtils.joinBigTable(new File("a.csv"),new File("b.csv"),"result.csv");
+            System.out.println("Complete!");
+
         } catch (Exception e ){
             e.printStackTrace();
         }
