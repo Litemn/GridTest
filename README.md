@@ -1,7 +1,3 @@
 # GridTest
-
-
-Join large table work very slow O(n^2)
-
-Better way is external sort files and than join. 
-
+Implement indexing file.
+Use Random access file. Writing position(length from begining file in bytes) of element id in first file to temp index file. Than accesing by id from second file.
